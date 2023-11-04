@@ -1,9 +1,27 @@
-import React,{useState} from 'react'
+import React,{useState, useEffect} from 'react'
 
 function SimpleSearch() {
-    const itemList = ["Iphone", "MacBook", "Play Station"];
+    const api_url = 'https://dummyjson.com/users';
     const [searchValue, setSearchValue]  = useState("")
-    const [list, setList] = useState(itemList);
+    const [list, setList] = useState([]);
+
+
+    const fetchAPIdata = async () => {
+        try {
+            const apiData = await fetch(api_url);
+            const response = await apiData.json();
+            return response
+            setList(response.users)
+        }
+        catch(error){
+            console.log(error)
+        }
+    }
+
+    useEffect(()=>{
+        fetchAPIdata()
+    },[])
+
 
     function handleChange(e){
         setSearchValue(e.target.value)
@@ -11,19 +29,15 @@ function SimpleSearch() {
 
     function handleSearch(){
         if (searchValue === "") {
-            setList(itemList);
             return;
         }
-      const filteredList = itemList.filter((item)=>{
-          if(item.toLowerCase().includes(searchValue.toLowerCase())){
-              return item
+       const filteredList = list.filter((item)=>{
+          if(item.firstName.toLowerCase().includes(searchValue.toLowerCase())){
+              return item.firstName;
           }
-      })
-
+       })
         setList(filteredList);
     }
-
-    console.log(searchValue)
 
     return (
         <>
@@ -32,8 +46,8 @@ function SimpleSearch() {
                 <button onClick={handleSearch}>Search</button>
              </div>
              <div>
-                 {list.map((item, id)=>{
-                        return <p key={id}>{item}</p>
+                 {list.map((item)=>{
+                        return <p key={item.id}>{item.firstName}</p>
                  })}
              </div>
         </>
